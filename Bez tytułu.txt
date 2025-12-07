@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<title>Moja Muzyka</title>
+
+<style>
+    body {
+        background: #0f0f0f;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+    }
+
+    header {
+        padding: 20px;
+        background: #1db954;
+        font-size: 26px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .container {
+        padding: 20px;
+        max-width: 700px;
+        margin: auto;
+    }
+
+    .upload-label {
+        background: #1db954;
+        padding: 12px 18px;
+        border-radius: 8px;
+        display: inline-block;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    #fileUpload {
+        display: none;
+    }
+
+    .song {
+        background: #1a1a1a;
+        padding: 12px;
+        margin-top: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .song:hover {
+        background: #262626;
+    }
+
+    .cover {
+        width: 45px;
+        height: 45px;
+        background: #333;
+        border-radius: 4px;
+    }
+
+    audio {
+        width: 100%;
+        margin-top: 25px;
+    }
+</style>
+
+</head>
+
+<body>
+
+<header>🎶 Twoja Muzyka</header>
+
+<div class="container">
+
+    <label class="upload-label">
+        + Dodaj utwory
+        <input type="file" id="fileUpload" accept="audio/*" multiple>
+    </label>
+
+    <div id="songList"></div>
+
+    <audio id="player" controls></audio>
+</div>
+
+<script>
+    const upload = document.getElementById("fileUpload");
+    const list = document.getElementById("songList");
+    const player = document.getElementById("player");
+
+    let queue = [];
+    let currentIndex = 0;
+
+    upload.addEventListener("change", function () {
+        [...this.files].forEach(file => {
+            const url = URL.createObjectURL(file);
+            queue.push({ name: file.name, url });
+
+            const div = document.createElement("div");
+            div.className = "song";
+            div.innerHTML = `
+                <div class="cover"></div>
+                <div>${file.name}</div>
+            `;
+
+            div.onclick = () => playSong(queue.indexOf(queue.find(s => s.url === url)));
+
+            list.appendChild(div);
+        });
+    });
+
+    function playSong(index) {
+        currentIndex = index;
+        player.src = queue[index].url;
+        player.play();
+    }
+
+    player.addEventListener("ended", () => {
+        if (currentIndex + 1 < queue.length) {
+            playSong(currentIndex + 1);
+        }
+    });
+</script>
+
+</body>
+</html>
